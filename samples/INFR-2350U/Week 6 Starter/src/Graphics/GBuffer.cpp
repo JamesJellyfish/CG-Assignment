@@ -103,3 +103,54 @@ void GBuffer::Reshape(unsigned width, unsigned height)
 	//Reshapes the framebuffer
 	_gBuffer.Reshape(width, height);
 }
+
+void GBuffer::DrawAlebo()
+{
+	//Binds passthrough shader
+	_passThrough->Bind();
+
+	_gBuffer.BindColorAsTexture(Target::ALBEDO, 0);
+	_gBuffer.DrawFullscreenQuad();
+	_gBuffer.UnbindTexture(0);
+
+	//Unbind our passthrough shader
+	_passThrough->UnBind();
+}
+
+void GBuffer::DrawNormal()
+{
+	//Binds passthrough shader
+	_passThrough->Bind();
+
+	_gBuffer.BindColorAsTexture(Target::NORMAL, 0);
+	_gBuffer.DrawFullscreenQuad();
+	_gBuffer.UnbindTexture(0);
+
+	//Unbind our passthrough shader
+	_passThrough->UnBind();
+}
+
+void GBuffer::DrawSpecular()
+{
+	//Binds passthrough shader
+	_passThrough->Bind();
+
+	_gBuffer.BindColorAsTexture(Target::SPECULAR, 0);
+	_gBuffer.DrawFullscreenQuad();
+	_gBuffer.UnbindTexture(0);
+
+	//Unbind our passthrough shader
+	_passThrough->UnBind();
+}
+
+void GBuffer::DrawPosition()
+{
+	//Binds passthrough shader
+	_passThrough->Bind();
+	_gBuffer.BindColorAsTexture(Target::POSITION, 0);
+	_gBuffer.DrawFullscreenQuad();
+	_gBuffer.UnbindTexture(0);
+
+	//Unbind our passthrough shader
+	_passThrough->UnBind();
+}

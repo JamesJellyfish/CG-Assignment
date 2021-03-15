@@ -42,6 +42,11 @@ int main() {
 	bool drawGBuffer = false;
 	bool drawIllumBuffer = false;
 
+	bool drawAlebo = false;
+	bool drawNormal = false;
+	bool drawSpecular = false;
+	bool drawPosition = false;
+
 	BackendHandler::InitAll();
 
 	// Let OpenGL know that we want debug output, and route it to our handler function
@@ -180,11 +185,12 @@ int main() {
 		// Load some textures from files
 		Texture2D::sptr stone = Texture2D::LoadFromFile("images/Stone_001_Diffuse.png");
 		Texture2D::sptr stoneSpec = Texture2D::LoadFromFile("images/Stone_001_Specular.png");
-		Texture2D::sptr grass = Texture2D::LoadFromFile("images/grass.jpg");
+		Texture2D::sptr grass = Texture2D::LoadFromFile("images/Ground.png");
 		Texture2D::sptr noSpec = Texture2D::LoadFromFile("images/grassSpec.png");
 		Texture2D::sptr box = Texture2D::LoadFromFile("images/box.bmp");
 		Texture2D::sptr boxSpec = Texture2D::LoadFromFile("images/box-reflections.bmp");
 		Texture2D::sptr simpleFlora = Texture2D::LoadFromFile("images/SimpleFlora.png");
+		Texture2D::sptr swing = Texture2D::LoadFromFile("images/Swing.png");
 		LUT3D testCube("cubes/BrightenedCorrection.cube");
 
 		// Load the cube map
@@ -248,18 +254,26 @@ int main() {
 		simpleFloraMat->Set("u_Shininess", 8.0f);
 		simpleFloraMat->Set("u_TextureMix", 0.0f);
 
+		ShaderMaterial::sptr swingMat = ShaderMaterial::Create();
+		swingMat->Shader = gBufferShader;
+		swingMat->Set("s_Diffuse", swing);
+		swingMat->Set("s_Specular", noSpec);
+		swingMat->Set("u_Shininess", 2.0f);
+		swingMat->Set("u_TextureMix", 0.0f);
+
 		GameObject obj1 = scene->CreateEntity("Ground"); 
 		{
 			VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("models/plane.obj");
 			obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
 		}
 
-		GameObject obj2 = scene->CreateEntity("monkey_quads");
+		GameObject obj2 = scene->CreateEntity("swing");
 		{
-			VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("models/monkey_quads.obj");
-			obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(stoneMat);
+			VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("models/Swing.obj");
+			obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(swingMat);
 			obj2.get<Transform>().SetLocalPosition(0.0f, 0.0f, 2.0f);
-			obj2.get<Transform>().SetLocalRotation(0.0f, 0.0f, -90.0f);
+			obj2.get<Transform>().SetLocalRotation(90.0f, 00.0f, -90.0f);
+			obj2.get<Transform>().SetLocalScale(0.5f, 0.5f, 0.5f);
 			BehaviourBinding::BindDisabled<SimpleMoveBehaviour>(obj2);
 		}
 
@@ -389,9 +403,17 @@ int main() {
 
 			//Toggles drawing specific buffers
 			keyToggles.emplace_back(GLFW_KEY_F1, [&]() { drawGBuffer = !drawGBuffer; });
-			keyToggles.emplace_back(GLFW_KEY_F2, [&]() { drawIllumBuffer - !drawIllumBuffer; });
-			controllables.push_back(obj2);
+			keyToggles.emplace_back(GLFW_KEY_F2, [&]() { drawIllumBuffer = !drawIllumBuffer; });
 
+			keyToggles.emplace_back(GLFW_KEY_1, [&]() { drawIllumBuffer = !drawIllumBuffer; });
+			keyToggles.emplace_back(GLFW_KEY_2, [&]() { drawPosition = !drawPosition; });
+			keyToggles.emplace_back(GLFW_KEY_3, [&]() { drawNormal = !drawNormal; });
+			keyToggles.emplace_back(GLFW_KEY_4, [&]() { drawAlebo = !drawAlebo; });
+			keyToggles.emplace_back(GLFW_KEY_5, [&]() { drawSpecular = !drawSpecular; });
+			
+			
+			controllables.push_back(obj2);
+			
 			keyToggles.emplace_back(GLFW_KEY_KP_ADD, [&]() {
 				BehaviourBinding::Get<SimpleMoveBehaviour>(controllables[selectedVao])->Enabled = false;
 				selectedVao++;
@@ -555,8 +577,6 @@ int main() {
 
 			gBuffer->Unbind();
 
-			//gBuffer->DrawBuffersToScreen();
-
 			illuminationBuffer->BindBuffer(0);
 
 			skybox->Bind();
@@ -586,6 +606,23 @@ int main() {
 				illuminationBuffer->DrawToScreen();
 			}
 
+			
+			if (drawAlebo)
+			{
+				gBuffer->DrawAlebo();
+			}
+			if (drawNormal)
+			{
+				gBuffer->DrawNormal();
+			}
+			if (drawSpecular)
+			{
+				gBuffer->DrawSpecular();
+			}
+			if (drawPosition)
+			{
+				gBuffer->DrawPosition();
+			}
 			//
 			/*effects[activeEffect]->ApplyEffect(basicEffect);
 			

@@ -37,6 +37,14 @@ public:
 
 	//Reshape the framebuffer
 	void Reshape(unsigned width, unsigned height);
+
+	void DrawAlebo();
+
+	void DrawNormal();
+
+	void DrawSpecular();
+
+	void DrawPosition();
 private:
 	Framebuffer _gBuffer;
 	Shader::sptr _passThrough;

@@ -190,7 +190,8 @@ int main() {
 		Texture2D::sptr box = Texture2D::LoadFromFile("images/box.bmp");
 		Texture2D::sptr boxSpec = Texture2D::LoadFromFile("images/box-reflections.bmp");
 		Texture2D::sptr simpleFlora = Texture2D::LoadFromFile("images/SimpleFlora.png");
-		Texture2D::sptr swing = Texture2D::LoadFromFile("images/Swing.png");
+		Texture2D::sptr RoundAbout = Texture2D::LoadFromFile("images/RoundAbout.png");
+		Texture2D::sptr Pathway = Texture2D::LoadFromFile("images/Pathway.png");
 		LUT3D testCube("cubes/BrightenedCorrection.cube");
 
 		// Load the cube map
@@ -254,29 +255,48 @@ int main() {
 		simpleFloraMat->Set("u_Shininess", 8.0f);
 		simpleFloraMat->Set("u_TextureMix", 0.0f);
 
-		ShaderMaterial::sptr swingMat = ShaderMaterial::Create();
-		swingMat->Shader = gBufferShader;
-		swingMat->Set("s_Diffuse", swing);
-		swingMat->Set("s_Specular", noSpec);
-		swingMat->Set("u_Shininess", 2.0f);
-		swingMat->Set("u_TextureMix", 0.0f);
+		ShaderMaterial::sptr RoundAboutMat = ShaderMaterial::Create();
+		RoundAboutMat->Shader = gBufferShader;
+		RoundAboutMat->Set("s_Diffuse", RoundAbout);
+		RoundAboutMat->Set("s_Specular", noSpec);
+		RoundAboutMat->Set("u_Shininess", 2.0f);
+		RoundAboutMat->Set("u_TextureMix", 0.0f);
+
+		ShaderMaterial::sptr PathwayMat = ShaderMaterial::Create();
+		PathwayMat->Shader = gBufferShader;
+		PathwayMat->Set("s_Diffuse", Pathway);
+		PathwayMat->Set("s_Specular", noSpec);
+		PathwayMat->Set("u_Shininess", 2.0f);
+		PathwayMat->Set("u_TextureMix", 0.0f);
+
 
 		GameObject obj1 = scene->CreateEntity("Ground"); 
 		{
-			VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("models/plane.obj");
+			VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("models/Ground.obj");
+			obj1.get<Transform>().SetLocalRotation(90.0f, 00.0f, -90.0f);
+			obj1.get<Transform>().SetLocalScale(0.2f, 0.2f, 0.2f);
 			obj1.emplace<RendererComponent>().SetMesh(vao).SetMaterial(grassMat);
 		}
 
-		GameObject obj2 = scene->CreateEntity("swing");
+		GameObject obj2 = scene->CreateEntity("RA");
 		{
-			VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("models/Swing.obj");
-			obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(swingMat);
-			obj2.get<Transform>().SetLocalPosition(0.0f, 0.0f, 2.0f);
+			VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("models/RoundAbout.obj");
+			obj2.emplace<RendererComponent>().SetMesh(vao).SetMaterial(RoundAboutMat);
+			obj2.get<Transform>().SetLocalPosition(19.0f, -7.0f, -1.0f);
 			obj2.get<Transform>().SetLocalRotation(90.0f, 00.0f, -90.0f);
-			obj2.get<Transform>().SetLocalScale(0.5f, 0.5f, 0.5f);
+			obj2.get<Transform>().SetLocalScale(0.4f, 0.4f, 0.4f);
 			BehaviourBinding::BindDisabled<SimpleMoveBehaviour>(obj2);
 		}
 
+		GameObject obj3 = scene->CreateEntity("Path");
+		{
+			VertexArrayObject::sptr vao = ObjLoader::LoadFromFile("models/Pathway.obj");
+			obj3.emplace<RendererComponent>().SetMesh(vao).SetMaterial(PathwayMat);
+			obj3.get<Transform>().SetLocalPosition(0.0f, 0.0f, 0.2f);
+			obj3.get<Transform>().SetLocalRotation(90.0f, 00.0f, -90.0f);
+			obj3.get<Transform>().SetLocalScale(0.2f, 0.2f, 0.2f);
+			BehaviourBinding::BindDisabled<SimpleMoveBehaviour>(obj3);
+		}
 	/*	std::vector<glm::vec2> allAvoidAreasFrom = { glm::vec2(-4.0f, -4.0f) };
 		std::vector<glm::vec2> allAvoidAreasTo = { glm::vec2(4.0f, 4.0f) };
 
